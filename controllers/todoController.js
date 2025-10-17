@@ -4,18 +4,21 @@ module.exports = {
   createTodo: async (req, res) => {
     try {
       const { title } = req.body;
-      const newTodo = new Todo({
-        title,
-      });
-      const savedTodo = await newTodo.save();
       if (!title) {
-        res.status(401).json({ message: "must add title!" });
+        return res.status(400).json({ message: "Title is required!" });
       }
+
+      const newTodo = new Todo({ title });
+      const savedTodo = await newTodo.save();
+
       res
-        .status(200)
-        .json({ message: "Add Todo successfully!!", Todo: savedTodo });
+        .status(201)
+        .json({ message: "Todo added successfully!", todo: savedTodo });
     } catch (err) {
-      res.status(500).json({ message: "Add todo failed!" });
+      if (err.name === 'ValidationError') {
+        return res.status(400).json({ message: err.message });
+      }
+      res.status(500).json({ message: "Failed to add todo!", error: err.message });
     }
   },
 
@@ -23,20 +26,13 @@ module.exports = {
     try {
       const allTodo = await Todo.find({});
 
-      if (allTodo.length == 0) {
-        return res.status(200).json({
-          message: "no todo data!",
-          Todo: [],
-        });
-      }
-
       res.status(200).json({
-        message: "get all todo!",
-        Todo: allTodo,
+        message: "Get all todos successfully!",
+        todos: allTodo,
       });
     } catch (err) {
       res.status(500).json({
-        message: "retrieve todo failed!",
+        message: "Failed to retrieve todos!",
         error: err.message,
       });
     }
@@ -48,21 +44,20 @@ module.exports = {
       const getById = await Todo.findById(_id);
 
       if (!getById) {
-        return res.status(404).json({
-          message: "no todo data!",
-          Todo: null,
-        });
+        return res.status(404).json({ message: "Todo not found.", todo: null });
       }
 
       res.status(200).json({
-        message: "get todo successfully!",
-        id: _id,
-        Todo: getById,
+        message: "Todo fetched successfully!",
+        todo: getById,
       });
     } catch (err) {
+      if (err.name === 'CastError') {
+        return res.status(400).json({ message: "Invalid Todo ID format." });
+      }
       res.status(500).json({
-        message: "failed to fetch data todos!",
-        err: err.message,
+        message: "Failed to fetch todo data!",
+        error: err.message,
       });
     }
   },
@@ -72,41 +67,54 @@ module.exports = {
       const { _id } = req.params;
       const todoId = _id.trim();
       const deleteTodo = await Todo.findByIdAndDelete(todoId);
+
       if (!deleteTodo) {
-        return res.status(404).json({ message: "todo data not found!" });
+        return res.status(404).json({ message: "Todo data not found!" });
       }
       res.status(200).json({
-        message: "Delete Todo succesfully!",
-        Todo: deleteTodo,
+        message: "Todo deleted successfully!",
+        todo: deleteTodo,
       });
     } catch (err) {
+      if (err.name === 'CastError') {
+        return res.status(400).json({ message: "Invalid Todo ID format." });
+      }
       res.status(500).json({
-        message: "Failed delete todo!",
-        err: err.message,
+        message: "Failed to delete todo!",
+        error: err.message,
       });
     }
   },
 
-  editTodo: async(req, res) => {
+  editTodo: async (req, res) => {
     try {
       const { _id } = req.params;
-      const { title, complete } = req.body
+      const { title, complete } = req.body;
+      
       const updatedTodo = await Todo.findByIdAndUpdate(
         _id,
         { title, complete },
-        { new: true }
+        { new: true, runValidators: true } 
       );
+
       if (!updatedTodo) {
         return res.status(404).json({ message: "Todo data not found!" });
-      } 
+      }
+
       res.status(200).json({
         message: "Todo updated successfully!",
-        Todo: updatedTodo,
+        todo: updatedTodo,
       });
     } catch (err) {
+      if (err.name === 'CastError') {
+        return res.status(400).json({ message: "Invalid Todo ID format." });
+      }
+      if (err.name === 'ValidationError') {
+        return res.status(400).json({ message: err.message });
+      }
       res.status(500).json({
         message: "Failed to edit todo!",
-        err: err.message,
+        error: err.message,
       });
     }
   },
@@ -118,9 +126,8 @@ module.exports = {
     } catch (err) {
       res.status(500).json({
         message: "Failed to delete all todos!",
-        err: err.message,
+        error: err.message,
       });
     }
   },
-
 };
