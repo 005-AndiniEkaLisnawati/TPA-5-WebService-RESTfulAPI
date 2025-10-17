@@ -1,0 +1,274 @@
+{
+	"info": {
+		"_postman_id": "1341f963-3f72-4343-9868-9b670666b43d",
+		"name": "TODOLIST ASSIGNMENT",
+		"description": "# 📝 TO-DO LIST API ASSIGNMENT\n\nSebuah RESTful API sederhana untuk mengelola daftar tugas (To-Do List), dibangun menggunakan **Node.js, Express.js, dan MongoDB**. API ini dilengkapi dengan sistem **Authentication (JWT)** dan **Authorization** untuk memastikan setiap pengguna hanya dapat mengelola tugasnya sendiri.\n\n## ✨ Fitur Utama\n\n- **Autentikasi Aman:** Menggunakan JSON Web Tokens (JWT) untuk _login_ dan otentikasi sesi.\n    \n- **Otorisasi Berbasis Kepemilikan:** Setiap Todo yang dibuat secara otomatis terikat pada `owner` (pemilik) sehingga pengguna lain tidak dapat mengakses, mengubah, atau menghapusnya.\n    \n- **CRUD Penuh:** Fungsionalitas lengkap untuk membuat, membaca, memperbarui, dan menghapus tugas.\n    \n\n## 🚀 Instalasi dan Menjalankan Proyek\n\n### Prasyarat\n\n- Node.js (LTS Version)\n    \n- MongoDB\n    \n- Postman atau _tool_ serupa untuk menguji API\n    \n\n### Langkah-Langkah\n\n1. Bashgit clone \\[LINK_REPOSITORY_ANDA\\]cd \\[NAMA_FOLDER_PROJECT\\]\n    \n2. Bashnpm install\n    \n3. Buat file .env di root proyek dan isi dengan konfigurasi berikut. Pastikan JWT_SECRET sama dengan yang digunakan di controller Anda.Cuplikan kodePORT=5001MONGO_URI=mongodb://localhost:27017/todo-dbJWT_SECRET=your_jwt_secret_yang_panjang_dan_aman\n    \n4. Bashnpm start# atau nodemon index.js (jika Anda menggunakannya)\n    \n\nServer akan berjalan di `http://localhost:5001`.\n\n## 🔑 Endpoint API\n\nSemua _endpoint_ yang berada di bawah `/todos` memerlukan _header_ **`Authorization: Bearer`** .\n\n### Authentication (Auth Routes)\n\n| **Metode** | **URL** | **Deskripsi** | **Status Code** |  \n| `POST` | `/auth/register` | Membuat akun pengguna baru. | `201 Created` |  \n| `POST` | `/auth/login` | _Login_ dan mendapatkan **JWT Token**. | `200 OK` |\n\n### To-Do List (Protected Routes)\n\n| **Metode** | **URL** | **Deskripsi** | **Middleware** |  \n| `GET` | `/todos` | **Melihat semua** Todo **milik sendiri** | `verifyToken` |  \n| `POST` | `/todos` | **Membuat** Todo baru (otomatis terikat pada `ownerId` dari token) | `verifyToken` |  \n| `GET` | `/todos/:_id` | **Melihat detail** Todo berdasarkan ID | `verifyToken` |  \n| `PUT` | `/todos/:_id` | **Memperbarui** Todo berdasarkan ID (hanya jika Anda pemiliknya) | `verifyToken` |  \n| `DELETE` | `/todos/:_id` | **Menghapus** Todo berdasarkan ID (hanya jika Anda pemiliknya) | `verifyToken` |  \n| `DELETE` | `/todos` | Menghapus **semua** Todo **milik sendiri** | `verifyToken` |\n\n## 💡 Panduan Pengujian (Postman)\n\nUntuk menguji _endpoint_ Todo, ikuti langkah-langkah ini:\n\n1. **Register:** Buat akun baru via `POST /auth/register`.\n    \n2. **Login:** Lakukan `POST /auth/login` dan **salin** seluruh _string_ token dari respons.\n    \n3. **Otorisasi:**\n    \n    - Buka _request_ `/todos` (misalnya `POST /todos`).\n        \n    - Buka _tab_ **Authorization**.\n        \n    - Pilih **Type:** **`Bearer Token`**.\n        \n    - **Paste** token yang sudah disalin ke _field_ **Token**.\n        \n4. **Gunakan API:** Sekarang Anda dapat mengakses semua _endpoint_ `/todos` untuk _user_ tersebut.\n    \n\n## 🤝 Kontributor\n\n- Andini Eka - Implementasi dan Pengecekan Keamanan.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "42944655"
+	},
+	"item": [
+		{
+			"name": "ADD TODO",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"title\": \"Belajar 9\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:5001/todos",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5001",
+					"path": [
+						"todos"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "ALL TODO",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2OGYyNDliYmY2MzdlYjlmMGRmNDUzZGYiLCJuYW1lIjoiYWt1IEFORElOIiwiaWF0IjoxNzYwNzEzNDUwLCJleHAiOjE3NjA3MTcwNTB9.99Cs095fH8h_2yvYK0FcrFJN_hVGQrWnyZjCMLXqrDs",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5001/todos",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5001",
+					"path": [
+						"todos"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "REGISTER",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"aku ANDIN\",\r\n    \"email\": \"ANDINn@gmail.com\",\r\n    \"password\": \"123455\"\r\n\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:5001/auth/register",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5001",
+					"path": [
+						"auth",
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "LOGIN",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"email\": \"ANDIN@gmail.com\",\r\n    \"password\": \"123455\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:5001/auth/login",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5001",
+					"path": [
+						"auth",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "TODO BY ID",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://localhost:5001/todos/{{id}}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5001",
+					"path": [
+						"todos",
+						"{{id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "DELETE TODO BY ID",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://localhost:5001/todos/{{id}}\n",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5001",
+					"path": [
+						"todos",
+						"{{id}}\n"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "EDIT TODO BY ID",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"title\": \"Belajar REST\",\r\n  \"complete\": true\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:5001/todos/{{id}}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5001",
+					"path": [
+						"todos",
+						"{{id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "DELETE ALL TODO",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://localhost:5001/todos",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5001",
+					"path": [
+						"todos"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{token}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}
