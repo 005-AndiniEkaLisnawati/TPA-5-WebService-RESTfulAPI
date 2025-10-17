@@ -2,7 +2,7 @@ const User = require('../models/user.model');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
-const jwtsecret = process.env.JWT_SECRET || 'your_jwt_secret';
+
 
 module.exports = {
     register: async(req, res) => {
@@ -29,6 +29,7 @@ module.exports = {
 
     login: async(req, res) => {
         try {
+            const jwtsecret = process.env.JWT_SECRET || 'your_jwt_secret';
             const {email, password} = req.body;
             const user = await User.findOne({email});
             if(!user){
@@ -43,7 +44,7 @@ module.exports = {
             const token = jwt.sign({ _id: user._id, name: user.name }, jwtsecret, { expiresIn: '1h' });
             res.status(200).json({message: "Login succesfully!!",
                 token: token,
-                User: { _id: user._id, name: user.name, email: user.email}
+                user: { _id: user._id, name: user.name, email: user.email}
             })
         }
         catch(err){
