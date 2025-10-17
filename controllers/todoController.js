@@ -86,6 +86,41 @@ module.exports = {
       });
     }
   },
-  editTodo: () => {},
-  deleteAllTodo: () => {},
+
+  editTodo: async(req, res) => {
+    try {
+      const { _id } = req.params;
+      const { title, complete } = req.body
+      const updatedTodo = await Todo.findByIdAndUpdate(
+        _id,
+        { title, complete },
+        { new: true }
+      );
+      if (!updatedTodo) {
+        return res.status(404).json({ message: "Todo data not found!" });
+      } 
+      res.status(200).json({
+        message: "Todo updated successfully!",
+        Todo: updatedTodo,
+      });
+    } catch (err) {
+      res.status(500).json({
+        message: "Failed to edit todo!",
+        err: err.message,
+      });
+    }
+  },
+
+  deleteAllTodo: async (req, res) => {
+    try {
+      await Todo.deleteMany({});
+      res.status(200).json({ message: "All todos deleted successfully!" });
+    } catch (err) {
+      res.status(500).json({
+        message: "Failed to delete all todos!",
+        err: err.message,
+      });
+    }
+  },
+
 };
