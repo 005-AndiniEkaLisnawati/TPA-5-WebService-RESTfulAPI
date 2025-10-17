@@ -4,11 +4,12 @@ module.exports = {
   createTodo: async (req, res) => {
     try {
       const { title } = req.body;
+      const ownerId = req.user._id;
       if (!title) {
         return res.status(400).json({ message: "Title is required!" });
       }
 
-      const newTodo = new Todo({ title });
+      const newTodo = new Todo({ title, owner: ownerId });
       const savedTodo = await newTodo.save();
 
       res
@@ -24,7 +25,8 @@ module.exports = {
 
   getAllTodo: async (req, res) => {
     try {
-      const allTodo = await Todo.find({});
+      const ownerId = req.user._id;
+      const allTodo = await Todo.find({owner: ownerId});
 
       res.status(200).json({
         message: "Get all todos successfully!",
@@ -40,8 +42,9 @@ module.exports = {
 
   getTodo: async (req, res) => {
     try {
+      const ownerId = req.user._id;
       const { _id } = req.params;
-      const getById = await Todo.findById(_id);
+      const getById = await Todo.findOne({ _id: _id.trim(), owner: ownerId });
 
       if (!getById) {
         return res.status(404).json({ message: "Todo not found.", todo: null });
@@ -64,9 +67,10 @@ module.exports = {
 
   deleteTodo: async (req, res) => {
     try {
+      const ownerId = req.user._id;
       const { _id } = req.params;
       const todoId = _id.trim();
-      const deleteTodo = await Todo.findByIdAndDelete(todoId);
+      const deleteTodo = await Todo.findOneAndDelete({_id: todoId, owner: ownerId});
 
       if (!deleteTodo) {
         return res.status(404).json({ message: "Todo data not found!" });
@@ -89,12 +93,13 @@ module.exports = {
   editTodo: async (req, res) => {
     try {
       const { _id } = req.params;
+      const ownerId = req.user._id;
       const { title, complete } = req.body;
       
-      const updatedTodo = await Todo.findByIdAndUpdate(
-        _id,
+      const updatedTodo = await Todo.findOneAndUpdate(
+        { _id: _id.trim(),  owner: ownerId },
         { title, complete },
-        { new: true, runValidators: true } 
+        { new: true, runValidators: true }
       );
 
       if (!updatedTodo) {
@@ -121,7 +126,8 @@ module.exports = {
 
   deleteAllTodo: async (req, res) => {
     try {
-      await Todo.deleteMany({});
+      const ownerId = req.user._id;
+      await Todo.deleteMany({owner: ownerId});
       res.status(200).json({ message: "All todos deleted successfully!" });
     } catch (err) {
       res.status(500).json({

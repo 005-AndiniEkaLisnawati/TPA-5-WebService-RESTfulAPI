@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const {Schema} = mongoose;
+const { Schema } = mongoose;
 
 const todoSchema = new Schema({
     title: {
@@ -9,9 +9,15 @@ const todoSchema = new Schema({
     complete: {
         default: false,
         type: Boolean
+    },
+    owner: {
+        type: Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
     }
+}, { 
+    timestamps: true 
+});
 
-})
-
-const todo = mongoose.model("Todo", todoSchema)
-module.exports = todo
+const Todo = mongoose.model("Todo", todoSchema);
+module.exports = Todo;
