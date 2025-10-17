@@ -22,8 +22,8 @@ Sebuah RESTful API sederhana untuk mengelola daftar tugas (To-Do List), dibangun
 1.  **Clone Repositori:**
 
     ```bash
-    git clone [LINK_REPOSITORY_ANDA]
-    cd [NAMA_FOLDER_PROJECT]
+    git clone https://github.com/005-AndiniEkaLisnawati/TPA-5-WebService-RESTfulAPI
+    cd TPA-5-WebService-RESTfulAPI
     ```
 
 2.  **Instal Dependensi:**
