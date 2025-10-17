@@ -1,13 +1,14 @@
 const mongoose = require("mongoose");
-const {Shcema} = mongoose;
+const {Schema} = mongoose;
 
-const todoSchema = new Shcema({
+const todoSchema = new Schema({
     title: {
         type: String,
         required: true
     },
     complete: {
-        
+        default: false,
+        type: Boolean
     }
 
 })
